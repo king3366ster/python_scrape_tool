@@ -14,7 +14,7 @@ def loadScrapy():
     for parent in parents:
         if re.search('\.py$', parent):
             if parent != '__init__.py':
-                spiderList.append(parent.replace('.py', ''))   
+                spiderList.append(parent.replace('.py', ''))
     return spiderList
 
 def parseScrapy(spider):
@@ -53,11 +53,12 @@ def saveScrapy(data, config = {}):
                 'indexs': [6],
                 'columns': data['columns'],
                 'values': data['values']
-                
+
             })
         if 'indexs' in config:
             newData['indexs'] = config['indexs']
         try:
+            print newData['values'][0][0]
             sd.excelWriter(newData, node = table, if_exists = 'append')
         except Exception as what:
             print what
@@ -66,7 +67,7 @@ def saveScrapy(data, config = {}):
 
 
 if __name__ == '__main__':
-    
+
     spiderList = loadScrapy()
     for spider in spiderList:
         parseScrapy(spider)

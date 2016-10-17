@@ -8,8 +8,6 @@ import random, time, hashlib, re
 from ScrapeLib.HttpRequest import HttpRequest
 httpReq = HttpRequest()
 
-# time_now = time.strftime("%Y/%m/%d", time.localtime())
-
 class Scrape:
     def __init__(self):
         pass
@@ -22,47 +20,32 @@ class Scrape:
             urlList.append(searchItem.get('href'))
         return urlList
 
-    def searchLagou(self, keyword = ''):
-        url = 'http://www.lagou.com/jobs/list_%s' % keyword
-        httpData = httpReq.getData(url).read()
-        httpSoup = httpReq.bs4HttpData(httpData)
-        searchItem = httpSoup.find(id='positionHead')
-        if searchItem is None:
-            return 'Not Found'
-        searchItem = searchItem.find('div', class_='company-card')
-        searchItem = searchItem.find('li', class_='c_btn')
-        searchUrls = self.getAnchorHref(searchItem)
-        searchUrl = 'http:%s' % searchUrls[0]
-        return self.searchLagouCorp(searchUrl)
-
-    def searchLagouCorp(self, url):
+    def searchItjuziCorp(self, url):
         httpRes = httpReq.getData(url)
-        # print httpRes.code
         # print httpRes.info()
         httpSoup = httpReq.bs4HttpData(httpRes.read())
-        corp_title = httpSoup.find('div', class_='company_main').find('a')
-        corp_name = corp_title.get_text().strip()
-        corp_fullname = corp_title.get('title')
-        print corp_fullname
+        corp_title = httpSoup.find('div', class_='thewrap').find('div', class_ = 'rowhead')
+        corp_name = corp_title.find('div', class_='line-title').find('b').get_text().strip()
+        corp_name = re.subn('\s+', '', corp_name)
+        corp_process = corp_title.find('div', class_='line-title').find('b').find('span', class_='t-small').get_text().strip()
+
+        corp_name = corp_name[0].replace(corp_process, '')
+        corp_process = corp_process.replace('(', '').replace(')', '')
+
         # 公司基本信息
-        searchItem = httpSoup.find('div', id='container_right')
-        corp_type = searchItem.find('i', class_ = 'type').parent
-        corp_type = corp_type.find('span').get_text()
-        corp_process = searchItem.find('i', class_ = 'process').parent
-        corp_process = corp_process.find('span').get_text()
-        corp_number = searchItem.find('i', class_ = 'number').parent
-        corp_number = corp_number.find('span').get_text()
-        corp_address = searchItem.find('i', class_ = 'address').parent
-        corp_address = corp_address.find('span').get_text()
+        corp_type = corp_title.find('span', class_ = 'c-gray-aset').find_all('a')[1].get_text().strip()
+
+        corp_address = corp_title.find('span', class_ = 'loca').get_text().strip()
+        corp_address = re.subn('\s+', '', corp_address)[0]
 
         # 产品介绍
         corp_products = []
-        searchItems = httpSoup.find('div', id='container_left').find('div', id='company_products').find_all('div', class_='product_details')
+        searchItems = httpSoup.find('ul', class_='list-prod').find_all('div', class_='on-edit-hide')
         for searchItem in searchItems:
-            tmp = searchItem.find('div', 'product_url').find('a')
+            tmp = searchItem.find('b').find('a')
             product_name = tmp.get_text().strip()
             # product_url = tmp.get('href')
-            # product_profile = searchItem.find('div', class_='product_profile').get_text()
+            # product_profile = searchItem.find('p').get_text()
             # corp_products.append({
             #         'product_name': product_name,
             #         'product_url': product_url,
@@ -71,8 +54,11 @@ class Scrape:
             corp_products.append(product_name)
 
         # 公司介绍
-        searchItem = httpSoup.find('div', id='company_intro')
-        corp_content = searchItem.find('span', class_='company_content').get_text()
+        searchItem = httpSoup.find('div', class_='block-inc-info')
+        corp_content = searchItem.find('div', class_='des').get_text().strip()        
+        corp_descs = searchItem.find('div', class_='des-more').find_all('div')
+        corp_fullname = corp_descs[0].get_text().strip().replace(u'公司全称：', '')
+        corp_number = corp_descs[1].find_all('span')[1].get_text().strip().replace(u'公司规模：', '')
 
         return {
             'columns': ['corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products'],
@@ -89,15 +75,15 @@ class Scrape:
         #     'corp_products': ','.join(corp_products),
         # }
 
-    def run(self, rangeId = 5124):
-        url = 'http://www.lagou.com/gongsi/%d.html' % rangeId
-        item = self.searchLagouCorp(url)
+    def run(self, rangeId = 666):
+        url = 'http://itjuzi.com/company/%d' % rangeId
+        item = self.searchItjuziCorp(url)
         return item
 
     def init(self):
         return {
-            'range': range(1, 10000),
-            'table': 'lagou',
+            'range': range(1, 400000),
+            'table': 'itjuzi',
             'doctype': 'excel'
         }
 
@@ -108,8 +94,7 @@ if __name__ == '__main__':
 ##    item = t.searchLagou(keyword = keyword)
 ##    for key in item:
 ##        print key, item[key]
-    url = 'http://www.lagou.com/gongsi/5124.html'
-    # url = 'http://www.lagou.com/gongsi/4.html'
-    item = t.searchLagouCorp(url)
+
+    item = t.run()
     for key in item:
         print key, item[key]

@@ -43,7 +43,8 @@ class Scrape:
         corp_title = httpSoup.find('div', class_='company_main').find('a')
         corp_name = corp_title.get_text().strip()
         corp_fullname = corp_title.get('title')
-        print corp_fullname
+        corp_link = corp_title.get('href')
+        # print corp_fullname
         # 公司基本信息
         searchItem = httpSoup.find('div', id='container_right')
         corp_type = searchItem.find('i', class_ = 'type').parent
@@ -75,8 +76,8 @@ class Scrape:
         corp_content = searchItem.find('span', class_='company_content').get_text()
 
         return {
-            'columns': ['corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products'],
-            'values': [[corp_name, corp_fullname, corp_type, corp_process, corp_number, corp_address, corp_content, ','.join(corp_products)]]
+            'columns': ['corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products', 'corp_link'],
+            'values': [[corp_name, corp_fullname, corp_type, corp_process, corp_number, corp_address, corp_content, ','.join(corp_products), corp_link]]
         }
         # return {
         #     'corp_name': unicode(corp_name),
@@ -96,7 +97,7 @@ class Scrape:
 
     def init(self):
         return {
-            'range': range(1, 10000),
+            'range': range(1, 1000000),
             'table': 'lagou',
             'doctype': 'excel'
         }
