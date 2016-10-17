@@ -27,7 +27,7 @@ class HttpRequest:
             }
 ##        print url
         req = urllib2.Request(url, headers = headers);
-        res_data = self.opener.open(req, timeout = 5) # urllib2.urlopen(req)
+        res_data = self.opener.open(req, timeout = 20) # urllib2.urlopen(req)
         return res_data
 
     # dataType formdata/text/json/xml
