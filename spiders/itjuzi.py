@@ -37,6 +37,7 @@ class Scrape:
 
         corp_address = corp_title.find('span', class_ = 'loca').get_text().strip()
         corp_address = re.subn('\s+', '', corp_address)[0]
+        corp_link = corp_title.find('a', class_ = 'weblink').get('href')
 
         # 产品介绍
         corp_products = []
@@ -55,14 +56,14 @@ class Scrape:
 
         # 公司介绍
         searchItem = httpSoup.find('div', class_='block-inc-info')
-        corp_content = searchItem.find('div', class_='des').get_text().strip()        
+        corp_content = searchItem.find('div', class_='des').get_text().strip()
         corp_descs = searchItem.find('div', class_='des-more').find_all('div')
         corp_fullname = corp_descs[0].get_text().strip().replace(u'公司全称：', '')
         corp_number = corp_descs[1].find_all('span')[1].get_text().strip().replace(u'公司规模：', '')
 
         return {
-            'columns': ['corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products'],
-            'values': [[corp_name, corp_fullname, corp_type, corp_process, corp_number, corp_address, corp_content, ','.join(corp_products)]]
+            'columns': ['corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products', 'corp_link'],
+            'values': [[corp_name, corp_fullname, corp_type, corp_process, corp_number, corp_address, corp_content, ','.join(corp_products), corp_link]]
         }
         # return {
         #     'corp_name': unicode(corp_name),

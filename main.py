@@ -2,9 +2,13 @@
 #-*- coding:utf-8 -*-
 import os
 import re
+import multiprocessing
 currPath = os.getcwd()
 
 from ScrapeLib.SaveData import SaveData
+sd = SaveData(os.path.join(currPath, 'output/'))
+
+from ScrapeLib.Process import MultiProcess
 sd = SaveData(os.path.join(currPath, 'output/'))
 
 def loadScrapy():
@@ -17,7 +21,7 @@ def loadScrapy():
                 spiderList.append(parent.replace('.py', ''))
     return spiderList
 
-def parseScrapy(spider):
+def parseScrapy(spider, msg_queue = None):
     print spider
     exec('from spiders.%s import Scrape' % spider)
 
@@ -65,9 +69,15 @@ def saveScrapy(data, config = {}):
         print 'excel saved'
 
 
-
 if __name__ == '__main__':
 
+    msg_queue = multiprocessing.Queue()
+    # 获取脚本
     spiderList = loadScrapy()
-    for spider in spiderList:
-        parseScrapy(spider)
+    # for spider in spiderList:
+    #     parseScrapy(spider)
+
+    # 初始化多进程
+    spiderList = map(lambda x: (x,), spiderList)
+    mp = MultiProcess(parseScrapy, process_num = len(spiderList), process_params = spiderList)
+    mp.run(isJoin = False)
