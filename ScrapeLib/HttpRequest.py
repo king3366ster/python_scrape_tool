@@ -3,6 +3,7 @@
 
 import urllib2, urllib, cookielib
 import json, xmltodict
+from bs4 import BeautifulSoup
 
 class HttpRequest:
     def __init__(self):
@@ -58,6 +59,10 @@ class HttpRequest:
         req = urllib2.Request(url, data, headers = headers);
         res_data = self.opener.open(req)
         return res_data
+
+    def bs4HttpData(self, data):
+        bsHandle = BeautifulSoup(data, 'lxml')
+        return bsHandle
 
 if __name__ == '__main__':
 
