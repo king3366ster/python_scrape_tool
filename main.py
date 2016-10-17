@@ -27,6 +27,7 @@ def parseScrapy(spider):
         rangeIds = config['range']
         for rangeId in rangeIds:
             try:
+                print '%s - %s' % (spider, rangeId)
                 spData = sp.run(rangeId)
                 config['indexs'] = [rangeId]
                 saveScrapy(spData, config)

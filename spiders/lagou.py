@@ -37,8 +37,9 @@ class Scrape:
 
     def searchLagouCorp(self, url):
         httpRes = httpReq.getData(url)
+        # print httpRes.code
+        # print httpRes.info()
         httpSoup = httpReq.bs4HttpData(httpRes.read())
-
         corp_title = httpSoup.find('div', class_='company_main').find('a')
         corp_name = corp_title.get_text().strip()
         corp_fullname = corp_title.get('title')
@@ -95,7 +96,7 @@ class Scrape:
 
     def init(self):
         return {
-            'range': range(10, 10000),
+            'range': range(1, 10000),
             'table': 'lagou',
             'doctype': 'excel'
         }
