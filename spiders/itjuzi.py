@@ -20,7 +20,7 @@ class Scrape:
             urlList.append(searchItem.get('href'))
         return urlList
 
-    def searchItjuziCorp(self, url):
+    def searchItjuziCorp(self, url, corp_id = 1):
         httpRes = httpReq.getData(url)
         # print httpRes.info()
         httpSoup = httpReq.bs4HttpData(httpRes.read())
@@ -62,8 +62,8 @@ class Scrape:
         corp_number = corp_descs[1].find_all('span')[1].get_text().strip().replace(u'公司规模：', '')
 
         return {
-            'columns': ['corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products', 'corp_link'],
-            'values': [[corp_name, corp_fullname, corp_type, corp_process, corp_number, corp_address, corp_content, ','.join(corp_products), corp_link]]
+            'columns': ['corp_id', 'corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products', 'corp_link', 'created_at', 'updated_at'],
+            'values': [[corp_id, corp_name, corp_fullname, corp_type, corp_process, corp_number, corp_address, corp_content, ','.join(corp_products), corp_link, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())]]
         }
         # return {
         #     'corp_name': unicode(corp_name),
@@ -78,14 +78,14 @@ class Scrape:
 
     def run(self, rangeId = 666):
         url = 'http://itjuzi.com/company/%d' % rangeId
-        item = self.searchItjuziCorp(url)
+        item = self.searchItjuziCorp(url, rangeId)
         return item
 
     def init(self):
         return {
             'range': range(1, 400000),
-            'table': 'itjuzi',
-            'doctype': 'excel'
+            'table': 'sp_itjuzi',
+            'doctype': 'mysql'
         }
 
 if __name__ == '__main__':

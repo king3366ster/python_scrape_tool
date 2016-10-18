@@ -6,10 +6,9 @@ import multiprocessing
 currPath = os.getcwd()
 
 from ScrapeLib.SaveData import SaveData
-sd = SaveData(os.path.join(currPath, 'output/'))
-
 from ScrapeLib.Process import MultiProcess
-sd = SaveData(os.path.join(currPath, 'output/'))
+
+import settings
 
 def loadScrapy():
     spiderList = []
@@ -24,9 +23,17 @@ def loadScrapy():
 def parseScrapy(spider, msg_queue = None):
     print spider
     exec('from spiders.%s import Scrape' % spider)
-
     sp = Scrape()
     config = sp.init()
+
+    # 存储实例
+    config['saveIns'] = SaveData(os.path.join(currPath, 'output/'))
+
+    if 'doctype' in config:
+        if config['doctype'] == 'mysql':
+            mysqlServer = settings.MYSQLSERVER
+            config['saveIns'].mysqlConnect(mysqlServer)
+
     if 'range' in config:
         rangeIds = config['range']
         for rangeId in rangeIds:
@@ -36,7 +43,7 @@ def parseScrapy(spider, msg_queue = None):
                 config['indexs'] = [rangeId]
                 saveScrapy(spData, config)
             except Exception as what:
-                print what
+                print '%s - %s' % (spider, what)
     else:
         try:
             spData = sp.run()
@@ -48,25 +55,40 @@ def saveScrapy(data, config = {}):
     doctype = 'excel'
     if 'doctype' in config:
         doctype = config['doctype']
+
     table = 'test'
     if 'table' in config:
         table = config['table']
 
-    if doctype == 'excel':
-        newData = dict({
-                'indexs': [6],
-                'columns': data['columns'],
-                'values': data['values']
+    id_offset = 0
+    if 'id_offset' in config:
+        id_offset = config['id_offset']
 
-            })
-        if 'indexs' in config:
-            newData['indexs'] = config['indexs']
+    newData = dict({
+        'indexs': [1],
+        'columns': data['columns'],
+        'values': data['values']
+    })
+    if 'indexs' in config:
+        newData['indexs'] = config['indexs']
+
+    saveIns = config['saveIns']
+
+    if doctype == 'excel':
         try:
-            print newData['values'][0][0]
-            sd.excelWriter(newData, node = table, if_exists = 'append')
+            print ('%s-%s' % (table, newData['values'][0][0]))
+            saveIns.excelWriter(newData, tb_name = table, if_exists = 'append', id_offset = id_offset)
         except Exception as what:
-            print what
+            print ('%s-%s' % (table, what))
         print 'excel saved'
+
+    elif doctype == 'mysql':
+        try:
+            print ('%s-%s' % (table, newData['values'][0][0]))
+            saveIns.mysqlWriter(newData, tb_name = table, if_exists = 'append')
+        except Exception as what:
+            print ('%s-%s' % (table, what))
+        print 'mysql saved'
 
 
 if __name__ == '__main__':

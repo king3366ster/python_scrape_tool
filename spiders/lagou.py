@@ -35,7 +35,7 @@ class Scrape:
         searchUrl = 'http:%s' % searchUrls[0]
         return self.searchLagouCorp(searchUrl)
 
-    def searchLagouCorp(self, url):
+    def searchLagouCorp(self, url, corp_id = 1):
         httpRes = httpReq.getData(url)
         # print httpRes.code
         # print httpRes.info()
@@ -76,8 +76,8 @@ class Scrape:
         corp_content = searchItem.find('span', class_='company_content').get_text()
 
         return {
-            'columns': ['corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products', 'corp_link'],
-            'values': [[corp_name, corp_fullname, corp_type, corp_process, corp_number, corp_address, corp_content, ','.join(corp_products), corp_link]]
+            'columns': ['corp_id', 'corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products', 'corp_link', 'created_at', 'updated_at'],
+            'values': [[corp_id, corp_name, corp_fullname, corp_type, corp_process, corp_number, corp_address, corp_content, ','.join(corp_products), corp_link, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())]]
         }
         # return {
         #     'corp_name': unicode(corp_name),
@@ -92,14 +92,14 @@ class Scrape:
 
     def run(self, rangeId = 5124):
         url = 'http://www.lagou.com/gongsi/%d.html' % rangeId
-        item = self.searchLagouCorp(url)
+        item = self.searchLagouCorp(url, rangeId)
         return item
 
     def init(self):
         return {
             'range': range(1, 1000000),
-            'table': 'lagou',
-            'doctype': 'excel'
+            'table': 'sp_lagou',
+            'doctype': 'mysql'
         }
 
 if __name__ == '__main__':
