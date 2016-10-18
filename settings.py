@@ -8,3 +8,5 @@ MYSQLSERVER = {
     'db': 'scrapy',
     'port': 3306
 }
+
+# SPIDERPATH = 'spiders'

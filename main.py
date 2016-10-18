@@ -9,10 +9,14 @@ from ScrapeLib.SaveData import SaveData
 from ScrapeLib.Process import MultiProcess
 
 import settings
+try:
+    spiderModule = settings.SPIDERPATH
+except:
+    spiderModule = 'spiders'
 
 def loadScrapy():
     spiderList = []
-    spiderPath = os.path.join(currPath, 'spiders')
+    spiderPath = os.path.join(currPath, spiderModule)
     parents = os.listdir(spiderPath)
     for parent in parents:
         if re.search('\.py$', parent):
@@ -22,7 +26,7 @@ def loadScrapy():
 
 def parseScrapy(spider, msg_queue = None):
     print spider
-    exec('from spiders.%s import Scrape' % spider)
+    exec('from %s.%s import Scrape' % (spiderModule, spider))
     sp = Scrape()
     config = sp.init()
 
