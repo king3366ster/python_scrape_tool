@@ -97,7 +97,7 @@ class Scrape:
 
     def init(self):
         return {
-            'range': range(1, 1000000),
+            'range': range(1, 10),
             'table': 'sp_lagou',
             'doctype': 'mysql'
         }

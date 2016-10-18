@@ -51,7 +51,7 @@ class Scrape:
 
     def init(self):
         return {
-            'range': range(1, 5000000),
+            'range': range(1, 10),
             'table': 'sp_51job',
             'doctype': 'mysql',
             'id_offset': 0

@@ -83,7 +83,7 @@ class Scrape:
 
     def init(self):
         return {
-            'range': range(1, 400000),
+            'range': range(1, 10),
             'table': 'sp_itjuzi',
             'doctype': 'mysql'
         }

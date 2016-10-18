@@ -36,7 +36,26 @@ def parseScrapy(spider, msg_queue = None):
 
     if 'range' in config:
         rangeIds = config['range']
-        for rangeId in rangeIds:
+        it_start = 0
+        it_end = 0
+        it_type = 'list'
+        if isinstance(rangeIds, dict):
+            it_start = rangeIds['start']
+            it_end = rangeIds['end']
+            it_type = 'dict'
+        elif isinstance(rangeIds, list) or isinstance(rangeIds, tuple):
+            it_start = rangeIds[0]
+            it_end = rangeIds[-1]
+            it_type = 'list'
+        it_index = it_start
+        while True:
+            if it_index >= it_end:
+                break
+            if it_type == 'list':
+                rangeId = rangeIds[it_index]
+            elif it_type == 'dict':
+                rangeId = it_index
+            it_index += 1
             try:
                 print '%s - %s' % (spider, rangeId)
                 spData = sp.run(rangeId)
