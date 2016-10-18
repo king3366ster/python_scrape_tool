@@ -89,9 +89,11 @@ class SaveData:
         self._port = _port
 
         try:
-            self.conn = MySQLdb.connect(host = _host, user = _user, passwd = _pwd, port = _port, charset = 'utf8', use_unicode = True)
+            # self.conn = MySQLdb.connect(host = _host, user = _user, passwd = _pwd, port = _port, charset = 'utf8', use_unicode = True)
+            pool = PooledDB(MySQLdb, 5, host = _host, user = _user, passwd = _pwd, port = _port, db = _db, charset = 'utf8', use_unicode = True)
+            self.conn = pool.connection()
             self.cursor = self.conn.cursor()
-            self.conn.select_db(_db)
+            # self.conn.select_db(_db)
             print 'Mysql connected %s %s' % (_host, _db)
         except MySQLdb.Error,e:
             print 'Mysql Error %d: %s' % (e.args[0], e.args[1])
