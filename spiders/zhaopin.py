@@ -53,12 +53,13 @@ class Scrape:
     def init(self):
         return {
             'range': {
-                'start': 1,
+                'start': 100000001,
                 'end': 1209732211
             },
             'table': 'sp_zhaopin',
             'doctype': 'mysql',
-            'id_offset': 0
+            'id_offset': 0,
+            'unique_key': 'corp_id'
         }
 
 if __name__ == '__main__':

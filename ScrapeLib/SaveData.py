@@ -126,23 +126,23 @@ class SaveData:
             insert_string = 'INSERT INTO %s (%s) VALUES (%s);' % (tb_name, ','.join(columns), ','.join(values_occup))
 
             if unique_key is not None:
-                unique_key_list = []
                 if isinstance(unique_key, str) or isinstance(unique_key, unicode):
-                    if unique_key in columns:
-                        unique_key_list.append(unique_key)
-                    else:
-                        unique_key = None
+                    unique_key = [unique_key]
                 elif isinstance(unique_key, list) or isinstance(unique_key, tuple):
-                    update_column = columns[:]
-                    for ukey in unique_key:
-                        if ukey in columns:
-                            unique_key_list.append(ukey)
-                            update_column.remove(ukey)
-                    if len(unique_key_list) == 0:
-                        unique_key = None
-                    else:
-                        values_occup = map(lambda x: '%s=%%s' % x, update_column)
-                        update_string = 'UPDATE %s SET %s WHERE ' % (tb_name, ','.join(values_occup))
+                    unique_key = unique_key
+
+                unique_key_list = []
+                update_column = columns[:]
+                for ukey in unique_key:
+                    if ukey in columns:
+                        unique_key_list.append(ukey)
+                        update_column.remove(ukey)
+
+                if len(unique_key_list) == 0:
+                    unique_key = None
+                else:
+                    values_occup = map(lambda x: '%s=%%s' % x, update_column)
+                    update_string = 'UPDATE %s SET %s WHERE ' % (tb_name, ','.join(values_occup))
 
             for single_vals in values:
                 insert_list = []

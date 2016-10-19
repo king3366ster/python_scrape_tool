@@ -72,7 +72,8 @@ class Scrape:
             },
             'table': 'sp_58tc',
             'doctype': 'mysql',
-            'id_offset': 0
+            'id_offset': 0,
+            'unique_key': 'corp_id'
         }
 
 if __name__ == '__main__':

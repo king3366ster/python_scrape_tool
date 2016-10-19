@@ -100,7 +100,8 @@ class Scrape:
         return {
             'range': range(1, 800000),
             'table': 'sp_lagou',
-            'doctype': 'mysql'
+            'doctype': 'mysql',
+            'unique_key': 'corp_id'
         }
 
 if __name__ == '__main__':
