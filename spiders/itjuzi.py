@@ -57,6 +57,8 @@ class Scrape:
         # 公司介绍
         searchItem = httpSoup.find('div', class_='block-inc-info')
         corp_content = searchItem.find('div', class_='des').get_text().strip()
+        corp_content = re.subn(r'\s+', ' ', corp_content)[0]
+
         corp_descs = searchItem.find('div', class_='des-more').find_all('div')
         corp_fullname = corp_descs[0].get_text().strip().replace(u'公司全称：', '')
         corp_number = corp_descs[1].find_all('span')[1].get_text().strip().replace(u'公司规模：', '')
@@ -83,7 +85,7 @@ class Scrape:
 
     def init(self):
         return {
-            'range': range(1, 10),
+            'range': range(1, 800000),
             'table': 'sp_itjuzi',
             'doctype': 'mysql'
         }

@@ -68,7 +68,7 @@ class Scrape:
         return {
             'range': {
                 'start': 1,
-                'end': 10
+                'end': 137770926945303
             },
             'table': 'sp_58tc',
             'doctype': 'mysql',

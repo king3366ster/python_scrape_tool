@@ -3,6 +3,7 @@
 import os
 import re
 import multiprocessing
+import pdb
 currPath = os.getcwd()
 
 from ScrapeLib.SaveData import SaveData
@@ -63,7 +64,8 @@ def parseScrapy(spider, msg_queue = None):
             try:
                 print '%s - %s' % (spider, rangeId)
                 spData = sp.run(rangeId)
-                config['indexs'] = [rangeId]
+                if 'indexs' not in spData:
+                    config['indexs'] = [rangeId]
                 saveScrapy(spData, config)
             except Exception as what:
                 print '%s - %s' % (spider, what)
@@ -87,6 +89,10 @@ def saveScrapy(data, config = {}):
     if 'id_offset' in config:
         id_offset = config['id_offset']
 
+    unique_key = None
+    if 'unique_key' in config:
+        unique_key = config['unique_key']
+
     newData = dict({
         'indexs': [1],
         'columns': data['columns'],
@@ -108,7 +114,7 @@ def saveScrapy(data, config = {}):
     elif doctype == 'mysql':
         try:
             print ('%s-%s' % (table, newData['values'][0][0]))
-            saveIns.mysqlWriter(newData, tb_name = table, if_exists = 'append')
+            saveIns.mysqlWriter(newData, tb_name = table, if_exists = 'append', unique_key = unique_key)
         except Exception as what:
             print ('%s-%s' % (table, what))
         print 'mysql saved'
@@ -119,6 +125,7 @@ if __name__ == '__main__':
     msg_queue = multiprocessing.Queue()
     # 获取脚本
     spiderList = loadScrapy()
+    # # for debug
     # for spider in spiderList:
     #     parseScrapy(spider)
 

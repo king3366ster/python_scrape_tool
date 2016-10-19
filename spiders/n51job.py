@@ -33,11 +33,13 @@ class Scrape:
         corp_process = corp_info[0].strip()
         corp_number = corp_info[1].strip()
 
-        corp_address = httpSoup.find('div', class_ = 'bmsg').find('p', class_ = 'fp').get_text().replace('\n', '').replace(' ', '')
+        corp_address = httpSoup.find('div', class_ = 'bmsg').find('p', class_ = 'fp').get_text().replace('\n', '')
+        corp_address = re.subn(r'\s+', ' ', corp_address)[0].strip()
         corp_products = []
 
         # 公司介绍
         corp_content = httpSoup.find('div', class_='con_msg').find('p').get_text().strip()
+        corp_content = re.subn(r'\s+', ' ', corp_content)[0]
 
         return {
             'columns': ['corp_id', 'corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products', 'corp_link', 'created_at', 'updated_at'],
@@ -51,7 +53,10 @@ class Scrape:
 
     def init(self):
         return {
-            'range': range(1, 10),
+            'range': {
+                'start': 1,
+                'end': 10000000
+            },
             'table': 'sp_51job',
             'doctype': 'mysql',
             'id_offset': 0

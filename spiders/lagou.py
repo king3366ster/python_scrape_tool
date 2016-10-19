@@ -73,7 +73,8 @@ class Scrape:
 
         # 公司介绍
         searchItem = httpSoup.find('div', id='company_intro')
-        corp_content = searchItem.find('span', class_='company_content').get_text()
+        corp_content = searchItem.find('span', class_='company_content').get_text().replace('\n', '').strip()
+        corp_content = re.subn(r'\s+', ' ', corp_content)[0]
 
         return {
             'columns': ['corp_id', 'corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products', 'corp_link', 'created_at', 'updated_at'],
@@ -97,7 +98,7 @@ class Scrape:
 
     def init(self):
         return {
-            'range': range(1, 10),
+            'range': range(1, 800000),
             'table': 'sp_lagou',
             'doctype': 'mysql'
         }

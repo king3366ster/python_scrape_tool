@@ -75,4 +75,10 @@ if __name__ == '__main__':
     }
     t = HttpRequest()
     print t.getData('https://www.baidu.com/s?wd=%E6%B5%8B%E8%AF%95').read()
-    # t.postData('http://', data = q, dataType = 'formdata')
+
+    data = {
+            'identity': '',
+            'password': ''
+        };
+    res = t.postData('https://www.itjuzi.com/user/login', data = data, dataType = 'formdata')
+    print res.info()
