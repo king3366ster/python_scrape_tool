@@ -7,6 +7,8 @@ python爬虫引擎
 - pip install lxml
 - pip install openpyxl
 - pip install mysql DBUtils
+** 若使用最小近邻字符比较
+- pip install python-Levenshtein
 
 ## 工程原理
 - 在settings目录下配置工程全局配置，如MysqlServer相关参数

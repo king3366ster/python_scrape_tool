@@ -44,13 +44,14 @@ def parseScrapy(spider, msg_queue = None):
         it_start = 0
         it_end = 0
         it_type = 'list'
+
         if isinstance(rangeIds, dict):
             it_start = rangeIds['start']
             it_end = rangeIds['end']
             it_type = 'dict'
         elif isinstance(rangeIds, list) or isinstance(rangeIds, tuple):
-            it_start = rangeIds[0]
-            it_end = rangeIds[-1]
+            it_start = 0
+            it_end = len(rangeIds)
             it_type = 'list'
         it_index = it_start
         while True:
@@ -125,6 +126,7 @@ if __name__ == '__main__':
     msg_queue = multiprocessing.Queue()
     # 获取脚本
     spiderList = loadScrapy()
+    # parseScrapy('itjuzi')
     # # for debug
     # for spider in spiderList:
     #     parseScrapy(spider)
