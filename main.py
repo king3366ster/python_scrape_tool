@@ -25,11 +25,71 @@ def loadScrapy():
                 spiderList.append(parent.replace('.py', ''))
     return spiderList
 
-def parseScrapy(spider, msg_queue = None):
+def parseScrapy(spider):
     print spider
     exec('from %s.%s import Scrape' % (spiderModule, spider))
     sp = Scrape()
     config = sp.init()
+    if 'threads' in config:
+        threads = config['threads']
+    else:
+        threads = 1
+
+    if 'range' in config:
+        range_ids = config['range']
+        it_start = 0
+        it_end = 0
+        it_type = 'list'
+
+        if isinstance(range_ids, dict):
+            it_start = range_ids['start']
+            it_end = range_ids['end']
+            it_type = 'dict'
+        elif isinstance(range_ids, list) or isinstance(range_ids, tuple):
+            it_start = 0
+            it_end = len(range_ids)
+            it_type = 'list'
+    else:
+        raise Exception('please init ranges!')
+
+    if (it_end - it_start) < threads:
+        print ('warning: threads num < total ranges => auto lower threads!')
+        threads = it_end - it_start
+
+    it_step_float = (it_end - it_start) * 1.0 / threads
+    it_step = int(it_step_float)
+    if it_step != it_step_float:
+        print ('warning: threads num cannot divisible by total range num => auto remove some range ids!')
+
+    threadlist = []
+    for thread in range(0, threads):
+        it_end_t = it_start + it_step
+
+        if it_type == 'dict':
+            tmp_range = {
+                'start': it_start,
+                'end': it_end_t
+            }
+        elif it_type == 'list':
+            tmp_range = range_ids[it_start : it_end_t]
+        it_start = it_end_t
+
+        init_config = {
+            'spider': spider,
+            'scrape_class': Scrape,
+            'range': tmp_range,
+            'range_type': it_type
+        }
+        init_config = dict(config, **init_config)
+        threadlist.append(init_config)
+    return threadlist
+
+
+def runScrapy(config, msg_queue = None):
+    spider = config['spider']
+    print (spider)
+    Scrape = config['scrape_class']
+    sp = Scrape()
 
     # 存储实例
     config['saveIns'] = SaveData(os.path.join(currPath, 'output/'))
@@ -40,42 +100,38 @@ def parseScrapy(spider, msg_queue = None):
             config['saveIns'].mysqlConnect(mysqlServer)
 
     if 'range' in config:
-        rangeIds = config['range']
+        range_ids = config['range']
         it_start = 0
         it_end = 0
-        it_type = 'list'
+        it_type = config['range_type']
 
-        if isinstance(rangeIds, dict):
-            it_start = rangeIds['start']
-            it_end = rangeIds['end']
-            it_type = 'dict'
-        elif isinstance(rangeIds, list) or isinstance(rangeIds, tuple):
+        if it_type == 'dict':
+            it_start = range_ids['start']
+            it_end = range_ids['end']
+        elif it_type == 'list':
             it_start = 0
-            it_end = len(rangeIds)
-            it_type = 'list'
+            it_end = len(range_ids)
+        print ('%s range: %d-%d' % (spider, it_start, it_end))
+
         it_index = it_start
         while True:
             if it_index >= it_end:
                 break
             if it_type == 'list':
-                rangeId = rangeIds[it_index]
+                rangeId = range_ids[it_index]
             elif it_type == 'dict':
                 rangeId = it_index
             it_index += 1
             try:
-                print '%s - %s' % (spider, rangeId)
+                print 'runspider %s - %s' % (spider, rangeId)
                 spData = sp.run(rangeId)
                 if 'indexs' not in spData:
                     config['indexs'] = [rangeId]
                 saveScrapy(spData, config)
             except Exception as what:
-                print '%s - %s' % (spider, what)
+                print 'runspider error: %s - %s' % (spider, what)
     else:
-        try:
-            spData = sp.run()
-            saveScrapy(spData, config)
-        except Exception as what:
-            print what
+        raise Exception('please init ranges!')
 
 def saveScrapy(data, config = {}):
     doctype = 'excel'
@@ -106,10 +162,10 @@ def saveScrapy(data, config = {}):
 
     if doctype == 'excel':
         try:
-            print ('%s-%s' % (table, newData['values'][0][0]))
+            print ('save spider %s-%s' % (table, newData['values'][0][0]))
             saveIns.excelWriter(newData, tb_name = table, if_exists = 'append', id_offset = id_offset)
         except Exception as what:
-            print ('%s-%s' % (table, what))
+            print ('save errir %s-%s' % (table, what))
         print 'excel saved'
 
     elif doctype == 'mysql':
@@ -125,13 +181,18 @@ if __name__ == '__main__':
 
     msg_queue = multiprocessing.Queue()
     # 获取脚本
-    spiderList = loadScrapy()
-    # parseScrapy('itjuzi')
+    spiderlist = loadScrapy()
+
+    processlist = []
+    for spider in spiderlist:
+        processlist.extend(parseScrapy(spider))
+    # print processlist
+
     # # for debug
-    # for spider in spiderList:
-    #     parseScrapy(spider)
+    # for process in processlist:
+    #     runScrapy(process)
 
     # 初始化多进程
-    spiderList = map(lambda x: (x,), spiderList)
-    mp = MultiProcess(parseScrapy, process_num = len(spiderList), process_params = spiderList)
+    processlist = map(lambda x: (x,), processlist) # 多进程参数必须为tuple
+    mp = MultiProcess(runScrapy, process_num = len(processlist), process_params = processlist)
     mp.run(isJoin = False)

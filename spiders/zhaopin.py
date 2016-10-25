@@ -54,8 +54,9 @@ class Scrape:
         return {
             'range': {
                 'start': 100000001,
-                'end': 1209732211
+                'end':  1009732211
             },
+            'threads': 5,
             'table': 'sp_zhaopin',
             'doctype': 'mysql',
             'id_offset': 0,

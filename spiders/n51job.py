@@ -57,6 +57,7 @@ class Scrape:
                 'start': 1,
                 'end': 10000000
             },
+            'threads': 4,
             'table': 'sp_51job',
             'doctype': 'mysql',
             'id_offset': 0,
