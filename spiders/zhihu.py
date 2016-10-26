@@ -135,9 +135,11 @@ class Scrape:
     def init(self):
         return {
             'range': {
-                'start': 38044637,
+                'start': 10000000,
                 'end': 99999999
             },
+            # 'range': [1,3,8,2,41,42,12,32,13],
+            'threads': 5,
             'table': 'sp_zhihu',
             'doctype': 'mysql',
             'unique_key': ['question_id', 'answer_id']
