@@ -41,18 +41,22 @@ class Scrape:
 
         # 产品介绍
         corp_products = []
-        searchItems = httpSoup.find('ul', class_='list-prod').find_all('div', class_='on-edit-hide')
-        for searchItem in searchItems:
-            tmp = searchItem.find('b').find('a')
-            product_name = tmp.get_text().strip()
-            # product_url = tmp.get('href')
-            # product_profile = searchItem.find('p').get_text()
-            # corp_products.append({
-            #         'product_name': product_name,
-            #         'product_url': product_url,
-            #         'product_profile': product_profile
-            #     })
-            corp_products.append(product_name)
+        prod_items = httpSoup.find('ul', class_='list-prod')
+        if prod_items is None:
+            pass
+        else:
+            searchItems = prod_items.find_all('div', class_='on-edit-hide')
+            for searchItem in searchItems:
+                tmp = searchItem.find('b').find('a')
+                product_name = tmp.get_text().strip()
+                # product_url = tmp.get('href')
+                # product_profile = searchItem.find('p').get_text()
+                # corp_products.append({
+                #         'product_name': product_name,
+                #         'product_url': product_url,
+                #         'product_profile': product_profile
+                #     })
+                corp_products.append(product_name)
 
         # 公司介绍
         searchItem = httpSoup.find('div', class_='block-inc-info')
@@ -78,15 +82,15 @@ class Scrape:
         #     'corp_products': ','.join(corp_products),
         # }
 
-    def run(self, rangeId = 666):
+    def run(self, rangeId = 10001):
         url = 'http://itjuzi.com/company/%d' % rangeId
         item = self.searchItjuziCorp(url, rangeId)
         return item
 
     def init(self):
         return {
-            'range': range(1, 70000),
-            'threads': 3,
+            'range': range(1, 72000),
+            'threads': 1,
             'table': 'sp_itjuzi',
             'doctype': 'mysql',
             'unique_key': 'corp_id'
@@ -94,11 +98,6 @@ class Scrape:
 
 if __name__ == '__main__':
     t = Scrape()
-##    keyword = '中科方德'
-##    keyword = '阿里巴巴'
-##    item = t.searchLagou(keyword = keyword)
-##    for key in item:
-##        print key, item[key]
 
     item = t.run()
     for key in item:
