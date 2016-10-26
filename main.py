@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 #-*- coding:utf-8 -*-
-import os
-import re
+import os, sys
+import re, time
 import multiprocessing
 import pdb
 currPath = os.getcwd()
@@ -135,6 +135,9 @@ def runScrapy(config, msg_queue = None):
                 print 'runspider error: %s - %s' % (spider, what)
     else:
         raise Exception('please init ranges!')
+    pid = os.getpid()
+    print 'pid %d terminated' % pid
+    sys.exit()
 
 def saveScrapy(data, config = {}):
     doctype = 'excel'
