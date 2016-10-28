@@ -54,10 +54,10 @@ class Scrape:
     def init(self):
         return {
             'range': {
-                'start': 1,
-                'end': 10000000
+                'start': 580000,
+                'end':  6580001
             },
-            'threads': 4,
+            'threads': 6,
             'table': 'sp_51job',
             'doctype': 'mysql',
             'id_offset': 0,

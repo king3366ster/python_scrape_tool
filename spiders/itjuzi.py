@@ -90,7 +90,7 @@ class Scrape:
     def init(self):
         return {
             'range': range(1, 72000),
-            'threads': 1,
+            'threads': 0,
             'table': 'sp_itjuzi',
             'doctype': 'mysql',
             'unique_key': 'corp_id'

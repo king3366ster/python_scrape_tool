@@ -188,7 +188,7 @@ if __name__ == '__main__':
     msg_queue = multiprocessing.Queue()
     # 获取脚本
     spiderlist = loadScrapy()
-
+    # spiderlist = ['dajie']
     processlist = []
     for spider in spiderlist:
         processlist.extend(parseScrapy(spider))
