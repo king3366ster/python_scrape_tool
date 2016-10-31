@@ -27,9 +27,13 @@ class Scrape:
         # 公司基本信息
         corp_title = httpSoup.find('div', class_='basicMsg').find('ul', class_='basicMsgList')
         corp_item = corp_title.find('li')
-        corp_item = corp_item.find_next_sibling().find_next_sibling().find_next_sibling()
-##        print corp_item # 联系电话
-
+        corp_item = corp_item.find_next_sibling()
+        corp_contact_name = corp_item.get_text().replace(u'联系人：', '').strip()
+        corp_item = corp_item.find_next_sibling().find_next_sibling()
+        # 联系电话
+        corp_contact = corp_item.find('img').get('src')
+        corp_contact = '%s:<img src="%s">' % (corp_contact_name, corp_contact)
+##        print corp_contact
         corp_item = corp_item.find_next_sibling()
         corp_process = corp_item.get_text().replace(u'公司性质：', '').strip()
 
@@ -51,12 +55,11 @@ class Scrape:
         # 公司介绍
         corp_content = httpSoup.find('div', class_='compIntro').find('p').get_text().strip()
 
-##        corp_contact = httpSoup.find('div', class_='company-content').find_all('p', class_='MsoNormal')[-1]
 ##        print corp_contact.get_text()
 
         return {
-            'columns': ['corp_id', 'corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products', 'corp_link', 'created_at', 'updated_at'],
-            'values': [[corp_id, corp_name, corp_fullname, corp_type, corp_process, corp_number, corp_address, corp_content, ','.join(corp_products), corp_link, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())]]
+            'columns': ['corp_id', 'corp_name', 'corp_fullname', 'corp_type', 'corp_process', 'corp_number', 'corp_address', 'corp_content', 'corp_products', 'corp_contact', 'corp_link', 'created_at', 'updated_at'],
+            'values': [[corp_id, corp_name, corp_fullname, corp_type, corp_process, corp_number, corp_address, corp_content, ','.join(corp_products), corp_contact, corp_link, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())]]
         }
 
     def run(self, rangeId = 5124):
@@ -67,10 +70,10 @@ class Scrape:
     def init(self):
         return {
             'range': {
-                'start': 1,
-                'end':  107770926945303,
+                'start': 100002500000,
+                'end': 50100002500000,
             },
-            'threads': 5,
+            'threads': 50,
             'table': 'sp_58tc',
             'doctype': 'mysql',
             'id_offset': 0,

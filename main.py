@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 #-*- coding:utf-8 -*-
-import os
-import re
+import os, sys
+import re, time
 import multiprocessing
 import pdb
 currPath = os.getcwd()
@@ -14,6 +14,14 @@ try:
     spiderModule = settings.SPIDERPATH
 except:
     spiderModule = 'spiders'
+try:
+    spiderExcludes = settings.EXCLUDE
+except:
+    spiderExcludes = None
+try:
+    spiderIncludes = settings.INCLUDE
+except:
+    spiderIncludes = None
 
 def loadScrapy():
     spiderList = []
@@ -22,7 +30,17 @@ def loadScrapy():
     for parent in parents:
         if re.search('\.py$', parent):
             if parent != '__init__.py':
-                spiderList.append(parent.replace('.py', ''))
+                spiderName = parent.replace('.py', '')
+                if spiderExcludes is not None:
+                    if spiderName in spiderExcludes:
+                        print 'exclude %s' % spiderName
+                        continue
+                if spiderIncludes is not None:
+                    if spiderName in spiderIncludes:
+                        print 'include %s' % spiderName
+                        spiderList.append(spiderName)
+                else:
+                    spiderList.append(spiderName)
     return spiderList
 
 def parseScrapy(spider):
@@ -135,6 +153,9 @@ def runScrapy(config, msg_queue = None):
                 print 'runspider error: %s - %s' % (spider, what)
     else:
         raise Exception('please init ranges!')
+    pid = os.getpid()
+    print 'pid %d terminated' % pid
+    sys.exit()
 
 def saveScrapy(data, config = {}):
     doctype = 'excel'
@@ -185,7 +206,7 @@ if __name__ == '__main__':
     msg_queue = multiprocessing.Queue()
     # 获取脚本
     spiderlist = loadScrapy()
-
+    # spiderlist = ['dajie']
     processlist = []
     for spider in spiderlist:
         processlist.extend(parseScrapy(spider))
