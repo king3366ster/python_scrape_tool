@@ -6,9 +6,13 @@ import json, xmltodict
 from bs4 import BeautifulSoup
 
 class HttpRequest:
-    def __init__(self):
+    def __init__(self, proxy = None):
         cj = cookielib.CookieJar()
-        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+        if proxy is not None:
+            proxy_support = urllib2.ProxyHandler(proxy)
+            self.opener = urllib2.build_opener(proxy_support, urllib2.HTTPCookieProcessor(cj))
+        else:
+            self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
     def getData(self, url, data = None):
         if data is None:
