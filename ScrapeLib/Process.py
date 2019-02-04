@@ -34,7 +34,7 @@ class MultiProcess:
             proc.start()
             if isJoin:
                 proc.join()
-        print 'processs run'
+        print ('processs run')
 
     def stop(self):
         for proc in self.process_list:
@@ -45,14 +45,14 @@ class MultiProcess:
         print ('process stoped')
 
 def test_process(num, msg_queue):
-    print 'Process:', num
+    print ('Process:', num)
     name = multiprocessing.current_process().name
-    print 'Starting:', name
+    print ('Starting:', name)
     # sys.exit(0)
     pid = multiprocessing.current_process().pid
     time.sleep(2)
     msg_queue.put(pid)
-    print 'Exiting :', name
+    print ('Exiting :', name)
 
 if __name__ == '__main__':
     msg_queue = multiprocessing.Queue()
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     time.sleep(3)
     while msg_queue.empty() != True:
         msg = msg_queue.get()
-        print 'main proc get:%d' % msg
+        print ('main proc get:%d' % msg)
 ##        time.sleep(1)
 
 ##    t.stop()
